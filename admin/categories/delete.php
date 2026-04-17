@@ -28,7 +28,7 @@ $stmt->execute([$id]);
 $productCount = (int) $stmt->fetchColumn();
 
 if ($productCount > 0) {
-    set_flash('error', 'This category cannot be deleted because it is assigned to existing products.');
+    set_flash('error', 'This category cannot be deleted because products are assigned to it.');
     redirect(ADMIN_URL . 'categories/index.php');
 }
 

@@ -3,19 +3,23 @@ require_once __DIR__ . '/../includes/auth.php';
 
 $pageTitle = 'Categories - ' . APP_NAME;
 $pageHeading = 'Categories';
-$pageSubheading = 'Manage product categories for tables, chairs, staircases, racks, decorative items, and more.';
-
-$stmt = $pdo->query("SELECT c.*, 
-    (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id) AS product_count
-    FROM categories c
-    ORDER BY c.created_at DESC");
-$categories = $stmt->fetchAll();
+$pageSubheading = 'Create and manage product categories used throughout the website.';
+$pageCssFiles = ['categories.css'];
 
 $successMessage = get_flash('success');
 $errorMessage = get_flash('error');
 
+$stmt = $pdo->query("
+    SELECT c.*,
+           (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id) AS product_count
+    FROM categories c
+    ORDER BY c.id DESC
+");
+$categories = $stmt->fetchAll();
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
 <div class="admin-layout">
     <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
@@ -31,26 +35,26 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <div class="page-actions">
-            <a href="<?php echo ADMIN_URL; ?>categories/create.php" class="btn btn-primary">Add New Category</a>
+            <a href="<?php echo ADMIN_URL; ?>categories/create.php" class="btn btn-primary">Add Category</a>
         </div>
 
-        <section class="admin-card">
-            <div class="admin-card-header">
+        <section class="content-card">
+            <div class="content-card-header">
                 <h3>All Categories</h3>
             </div>
 
             <?php if (!empty($categories)): ?>
-                <div class="admin-table-wrap">
+                <div class="table-wrap">
                     <table class="admin-table">
                         <thead>
                             <tr>
                                 <th width="70">ID</th>
-                                <th>Name</th>
-                                <th>Slug</th>
+                                <th width="180">Name</th>
+                                <th width="180">Slug</th>
                                 <th>Description</th>
-                                <th width="120">Products</th>
-                                <th width="120">Status</th>
-                                <th width="190">Created</th>
+                                <th width="100">Products</th>
+                                <th width="100">Status</th>
+                                <th width="180">Created</th>
                                 <th width="180">Actions</th>
                             </tr>
                         </thead>
@@ -64,16 +68,23 @@ require_once __DIR__ . '/../includes/header.php';
                                     <td><?php echo e($category['product_count']); ?></td>
                                     <td>
                                         <?php if ((int)$category['status'] === 1): ?>
-                                            <span class="badge badge-success">Active</span>
+                                            <span class="status-badge active">Active</span>
                                         <?php else: ?>
-                                            <span class="badge badge-inactive">Inactive</span>
+                                            <span class="status-badge inactive">Inactive</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?php echo e(date('M d, Y h:i A', strtotime($category['created_at']))); ?></td>
+                                    <td><?php echo e(format_datetime($category['created_at'])); ?></td>
                                     <td>
                                         <div class="action-group">
-                                            <a class="btn btn-secondary btn-sm" href="<?php echo ADMIN_URL; ?>categories/edit.php?id=<?php echo (int)$category['id']; ?>">Edit</a>
-                                            <a class="btn btn-danger btn-sm" href="<?php echo ADMIN_URL; ?>categories/delete.php?id=<?php echo (int)$category['id']; ?>&csrf_token=<?php echo e(generate_csrf_token()); ?>" onclick="return confirm('Are you sure you want to delete this category?');">Delete</a>
+                                            <a href="<?php echo ADMIN_URL; ?>categories/edit.php?id=<?php echo (int)$category['id']; ?>" class="btn btn-dark btn-sm">
+                                                Edit
+                                            </a>
+
+                                            <a href="<?php echo ADMIN_URL; ?>categories/delete.php?id=<?php echo (int)$category['id']; ?>&csrf_token=<?php echo e(generate_csrf_token()); ?>"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Are you sure you want to delete this category?');">
+                                                Delete
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -89,4 +100,5 @@ require_once __DIR__ . '/../includes/header.php';
         </section>
     </main>
 </div>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

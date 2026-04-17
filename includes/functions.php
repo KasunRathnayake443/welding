@@ -86,3 +86,30 @@ function format_datetime(?string $datetime): string
 
     return date('M d, Y h:i A', strtotime($datetime));
 }
+
+function slugify(string $text): string
+{
+    $text = trim($text);
+    $text = strtolower($text);
+    $text = preg_replace('/[^a-z0-9]+/i', '-', $text);
+    $text = preg_replace('/-+/', '-', $text);
+    return trim($text, '-');
+}
+
+function category_slug_exists(PDO $pdo, string $slug, int $ignoreId = 0): bool
+{
+    if ($ignoreId > 0) {
+        $stmt = $pdo->prepare("SELECT id FROM categories WHERE slug = ? AND id != ? LIMIT 1");
+        $stmt->execute([$slug, $ignoreId]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id FROM categories WHERE slug = ? LIMIT 1");
+        $stmt->execute([$slug]);
+    }
+
+    return (bool) $stmt->fetch();
+}
+
+function allowed_property_field_types(): array
+{
+    return ['text', 'textarea', 'number', 'select'];
+}
