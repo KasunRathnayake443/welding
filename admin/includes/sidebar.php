@@ -35,6 +35,10 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
             Portfolio
         </a>
 
+        <a class="<?php echo $currentDir === 'portfolio-images' ? 'active' : ''; ?>" href="<?php echo ADMIN_URL; ?>portfolio-images/index.php">
+            Portfolio Images
+        </a>
+
         <a class="<?php echo $currentDir === 'inquiries' ? 'active' : ''; ?>" href="<?php echo ADMIN_URL; ?>inquiries/index.php">
             Inquiries
         </a>

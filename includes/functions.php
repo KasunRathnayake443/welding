@@ -231,3 +231,24 @@ function portfolio_slug_exists(PDO $pdo, string $slug, int $ignoreId = 0): bool
 
     return (bool)$stmt->fetch();
 }
+
+function generate_portfolio_upload_file_name(string $originalName): string
+{
+    $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    return uniqid('portfolio_', true) . '.' . $extension;
+}
+
+function allowed_inquiry_statuses(): array
+{
+    return ['new', 'contacted', 'closed'];
+}
+
+function is_valid_phone_text(string $value): bool
+{
+    return mb_strlen($value) <= 50;
+}
+
+function is_valid_whatsapp_text(string $value): bool
+{
+    return mb_strlen($value) <= 50;
+}

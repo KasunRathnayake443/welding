@@ -7,6 +7,7 @@ define('ASSETS_URL', BASE_URL . 'assets/');
 define('UPLOADS_URL', BASE_URL . 'uploads/');
 define('UPLOADS_PATH', __DIR__ . '/../uploads/');
 define('PRODUCT_UPLOADS_PATH', UPLOADS_PATH . 'products/');
+define('PORTFOLIO_UPLOADS_PATH', UPLOADS_PATH . 'portfolio/');
 
 define('ADMIN_SESSION_TIMEOUT', 7200); // 2 hours
 
