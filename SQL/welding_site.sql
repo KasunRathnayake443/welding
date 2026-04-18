@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 18, 2026 at 06:30 AM
+-- Generation Time: Apr 18, 2026 at 11:28 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.4.12
 
@@ -62,7 +62,8 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `status`, `created_at`) VALUES
-(2, 'Tables', 'tables', 'Steel Tables', 1, '2026-04-17 15:04:06');
+(2, 'Tables', 'tables', 'Steel Tables', 1, '2026-04-17 15:04:06'),
+(3, 'Chair', 'chair', NULL, 1, '2026-04-18 11:14:32');
 
 -- --------------------------------------------------------
 
@@ -105,6 +106,14 @@ CREATE TABLE `inquiries` (
   `status` varchar(50) DEFAULT 'new',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `inquiries`
+--
+
+INSERT INTO `inquiries` (`id`, `name`, `phone`, `email`, `subject`, `message`, `product_id`, `status`, `created_at`) VALUES
+(1, 'Kasun Rathnayake', '0718888888', 'kasunrathnayake121@gmail.com', 'ohhh i dont need this', 'i dont need thisw', 1, 'contacted', '2026-04-18 07:11:40'),
+(2, 'Kasun Rathnayake', '0718888888', 'kasunrathnayake121@gmail.com', 'Inquiry about product: Metal Chair', 'i need 10 of these', 2, 'new', '2026-04-18 11:21:33');
 
 -- --------------------------------------------------------
 
@@ -178,7 +187,8 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `category_id`, `name`, `slug`, `short_description`, `full_description`, `price_text`, `available_colors`, `is_customizable`, `is_featured`, `status`, `created_at`) VALUES
-(1, 2, 'Steel 2 x 4 table', 'steel-2-x-4-table', 'Steel 2 x4 table', 'Steel 2x4 tables made with box bar and custom table tops.  Granite, Wood, Glass etc.', 'Starting from Rs. 30000.00', 'Any Color', 1, 0, 1, '2026-04-18 04:09:51');
+(1, 2, 'Steel 2 x 4 table', 'steel-2-x-4-table', 'Steel 2 x4 table', 'Steel 2x4 tables made with box bar and custom table tops.  Granite, Wood, Glass etc.', 'Starting from Rs. 30000.00', 'Any Color', 1, 1, 1, '2026-04-18 04:09:51'),
+(2, 3, 'Metal Chair', 'metal-chair', 'Steel chair sets', 'Different types of steel chair sets', 'Starting from Rs. 10000.00', 'Any color', 1, 1, 1, '2026-04-18 11:18:03');
 
 -- --------------------------------------------------------
 
@@ -200,7 +210,11 @@ CREATE TABLE `product_extra_properties` (
 --
 
 INSERT INTO `product_extra_properties` (`id`, `product_id`, `property_name`, `property_value`, `sort_order`, `created_at`) VALUES
-(1, 1, 'Length', '2', 0, '2026-04-18 04:09:51');
+(2, 2, 'Length', '5 feet', 0, '2026-04-18 11:18:03'),
+(3, 2, 'width', '3 feet', 1, '2026-04-18 11:18:03'),
+(4, 2, 'hight', '2 feet', 2, '2026-04-18 11:18:03'),
+(5, 2, 'Steel type', 'Stainless steel', 3, '2026-04-18 11:18:03'),
+(10, 1, 'Length', '2', 0, '2026-04-18 11:24:55');
 
 -- --------------------------------------------------------
 
@@ -222,7 +236,11 @@ CREATE TABLE `product_images` (
 
 INSERT INTO `product_images` (`id`, `product_id`, `image_path`, `sort_order`, `created_at`) VALUES
 (1, 1, 'product_69e307ef6276d5.92383053.webp', 1, '2026-04-18 04:26:23'),
-(2, 1, 'product_69e30813aba247.61265296.webp', 1, '2026-04-18 04:26:59');
+(2, 1, 'product_69e30813aba247.61265296.webp', 1, '2026-04-18 04:26:59'),
+(3, 2, 'product_69e36894180966.61648327.jpg', 4, '2026-04-18 11:18:44'),
+(4, 2, 'product_69e3689d1c71e5.24036727.png', 2, '2026-04-18 11:18:53'),
+(5, 2, 'product_69e368a4ba1231.57235036.webp', 3, '2026-04-18 11:19:00'),
+(6, 2, 'product_69e368aab05309.19271250.jpg', 1, '2026-04-18 11:19:06');
 
 -- --------------------------------------------------------
 
@@ -243,7 +261,7 @@ CREATE TABLE `product_property_values` (
 --
 
 INSERT INTO `product_property_values` (`id`, `product_id`, `category_property_id`, `property_value`, `created_at`) VALUES
-(1, 1, 1, '5', '2026-04-18 04:09:51');
+(6, 1, 1, '5', '2026-04-18 11:24:55');
 
 -- --------------------------------------------------------
 
@@ -267,7 +285,7 @@ CREATE TABLE `site_settings` (
 --
 
 INSERT INTO `site_settings` (`id`, `site_name`, `phone`, `whatsapp`, `email`, `address`, `hero_title`, `hero_subtitle`) VALUES
-(1, 'Welding Sudhantha', '0718888888', '0718888888', 'kasunrathnayake121@gmail.com', '123\r\n1 st lane', 'Hello Kittie', 'World with marvelous Hello Kitties');
+(1, 'Brothers Work', '0718888888', '0718888888', 'kasunrathnayake121@gmail.com', '123\r\n1 st lane', 'Precision in Every Spark. Artistry in Every Weld', 'From structural integrity to bespoke metal designs, we transform raw steel into lasting legacies.');
 
 --
 -- Indexes for dumped tables
@@ -365,7 +383,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `category_properties`
@@ -377,7 +395,7 @@ ALTER TABLE `category_properties`
 -- AUTO_INCREMENT for table `inquiries`
 --
 ALTER TABLE `inquiries`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `portfolio_images`
@@ -395,25 +413,25 @@ ALTER TABLE `portfolio_items`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `product_extra_properties`
 --
 ALTER TABLE `product_extra_properties`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `product_property_values`
 --
 ALTER TABLE `product_property_values`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `site_settings`
