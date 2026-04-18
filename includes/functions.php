@@ -113,3 +113,121 @@ function allowed_property_field_types(): array
 {
     return ['text', 'textarea', 'number', 'select'];
 }
+
+function is_valid_status_value($value): bool
+{
+    return in_array((int)$value, [0, 1], true);
+}
+
+function get_active_categories(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT id, name, status FROM categories ORDER BY name ASC");
+    return $stmt->fetchAll();
+}
+
+function get_category_properties(PDO $pdo, int $categoryId, bool $onlyActive = false): array
+{
+    $sql = "SELECT * FROM category_properties WHERE category_id = ?";
+    if ($onlyActive) {
+        $sql .= " AND status = 1";
+    }
+    $sql .= " ORDER BY sort_order ASC, id ASC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$categoryId]);
+    return $stmt->fetchAll();
+}
+
+function product_slug_exists(PDO $pdo, string $slug, int $ignoreId = 0): bool
+{
+    if ($ignoreId > 0) {
+        $stmt = $pdo->prepare("SELECT id FROM products WHERE slug = ? AND id != ? LIMIT 1");
+        $stmt->execute([$slug, $ignoreId]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id FROM products WHERE slug = ? LIMIT 1");
+        $stmt->execute([$slug]);
+    }
+
+    return (bool)$stmt->fetch();
+}
+
+function ensure_directory_exists(string $path): void
+{
+    if (!is_dir($path)) {
+        mkdir($path, 0777, true);
+    }
+}
+
+function allowed_image_extensions(): array
+{
+    return ['jpg', 'jpeg', 'png', 'webp'];
+}
+
+function allowed_image_mime_types(): array
+{
+    return ['image/jpeg', 'image/png', 'image/webp'];
+}
+
+function is_valid_uploaded_image(array $file): array
+{
+    $errors = [];
+
+    if (!isset($file['error']) || is_array($file['error'])) {
+        $errors[] = 'Invalid file upload.';
+        return $errors;
+    }
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = 'File upload failed.';
+        return $errors;
+    }
+
+    if (($file['size'] ?? 0) <= 0) {
+        $errors[] = 'Uploaded file is empty.';
+    }
+
+    if (($file['size'] ?? 0) > 5 * 1024 * 1024) {
+        $errors[] = 'Image must not exceed 5MB.';
+    }
+
+    $extension = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+    if (!in_array($extension, allowed_image_extensions(), true)) {
+        $errors[] = 'Only JPG, JPEG, PNG, and WEBP images are allowed.';
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+
+    if (!in_array($mime, allowed_image_mime_types(), true)) {
+        $errors[] = 'Invalid image type uploaded.';
+    }
+
+    return $errors;
+}
+
+function generate_upload_file_name(string $originalName): string
+{
+    $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    return uniqid('product_', true) . '.' . $extension;
+}
+
+function delete_file_if_exists(string $absolutePath): void
+{
+    if (is_file($absolutePath)) {
+        unlink($absolutePath);
+    }
+}
+
+function portfolio_slug_exists(PDO $pdo, string $slug, int $ignoreId = 0): bool
+{
+    if ($ignoreId > 0) {
+        $stmt = $pdo->prepare("SELECT id FROM portfolio_items WHERE slug = ? AND id != ? LIMIT 1");
+        $stmt->execute([$slug, $ignoreId]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id FROM portfolio_items WHERE slug = ? LIMIT 1");
+        $stmt->execute([$slug]);
+    }
+
+    return (bool)$stmt->fetch();
+}

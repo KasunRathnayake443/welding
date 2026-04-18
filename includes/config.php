@@ -5,6 +5,8 @@ define('BASE_URL', 'http://localhost/welding/');
 define('ADMIN_URL', BASE_URL . 'admin/');
 define('ASSETS_URL', BASE_URL . 'assets/');
 define('UPLOADS_URL', BASE_URL . 'uploads/');
+define('UPLOADS_PATH', __DIR__ . '/../uploads/');
+define('PRODUCT_UPLOADS_PATH', UPLOADS_PATH . 'products/');
 
 define('ADMIN_SESSION_TIMEOUT', 7200); // 2 hours
 
