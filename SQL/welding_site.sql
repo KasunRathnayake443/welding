@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 17, 2026 at 01:54 PM
+-- Generation Time: Apr 18, 2026 at 06:30 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.4.12
 
@@ -57,6 +57,13 @@ CREATE TABLE `categories` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `status`, `created_at`) VALUES
+(2, 'Tables', 'tables', 'Steel Tables', 1, '2026-04-17 15:04:06');
+
 -- --------------------------------------------------------
 
 --
@@ -73,6 +80,13 @@ CREATE TABLE `category_properties` (
   `status` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `category_properties`
+--
+
+INSERT INTO `category_properties` (`id`, `category_id`, `property_name`, `field_type`, `placeholder`, `sort_order`, `status`, `created_at`) VALUES
+(1, 2, 'Width', 'number', '500 mm', 0, 1, '2026-04-17 15:11:21');
 
 -- --------------------------------------------------------
 
@@ -106,6 +120,14 @@ CREATE TABLE `portfolio_images` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `portfolio_images`
+--
+
+INSERT INTO `portfolio_images` (`id`, `portfolio_item_id`, `image_path`, `sort_order`, `created_at`) VALUES
+(1, 1, 'portfolio_69e31a2c590f37.89375977.webp', 0, '2026-04-18 05:44:12'),
+(2, 1, 'portfolio_69e31a35250906.56424876.webp', 0, '2026-04-18 05:44:21');
+
 -- --------------------------------------------------------
 
 --
@@ -122,6 +144,13 @@ CREATE TABLE `portfolio_items` (
   `status` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `portfolio_items`
+--
+
+INSERT INTO `portfolio_items` (`id`, `title`, `slug`, `short_description`, `full_description`, `is_featured`, `status`, `created_at`) VALUES
+(1, 'new', 'new', 'new', 'new', 1, 1, '2026-04-18 04:41:34');
 
 -- --------------------------------------------------------
 
@@ -144,6 +173,13 @@ CREATE TABLE `products` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `category_id`, `name`, `slug`, `short_description`, `full_description`, `price_text`, `available_colors`, `is_customizable`, `is_featured`, `status`, `created_at`) VALUES
+(1, 2, 'Steel 2 x 4 table', 'steel-2-x-4-table', 'Steel 2 x4 table', 'Steel 2x4 tables made with box bar and custom table tops.  Granite, Wood, Glass etc.', 'Starting from Rs. 30000.00', 'Any Color', 1, 0, 1, '2026-04-18 04:09:51');
+
 -- --------------------------------------------------------
 
 --
@@ -159,6 +195,13 @@ CREATE TABLE `product_extra_properties` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `product_extra_properties`
+--
+
+INSERT INTO `product_extra_properties` (`id`, `product_id`, `property_name`, `property_value`, `sort_order`, `created_at`) VALUES
+(1, 1, 'Length', '2', 0, '2026-04-18 04:09:51');
+
 -- --------------------------------------------------------
 
 --
@@ -173,6 +216,14 @@ CREATE TABLE `product_images` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `product_images`
+--
+
+INSERT INTO `product_images` (`id`, `product_id`, `image_path`, `sort_order`, `created_at`) VALUES
+(1, 1, 'product_69e307ef6276d5.92383053.webp', 1, '2026-04-18 04:26:23'),
+(2, 1, 'product_69e30813aba247.61265296.webp', 1, '2026-04-18 04:26:59');
+
 -- --------------------------------------------------------
 
 --
@@ -186,6 +237,13 @@ CREATE TABLE `product_property_values` (
   `property_value` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `product_property_values`
+--
+
+INSERT INTO `product_property_values` (`id`, `product_id`, `category_property_id`, `property_value`, `created_at`) VALUES
+(1, 1, 1, '5', '2026-04-18 04:09:51');
 
 -- --------------------------------------------------------
 
@@ -203,6 +261,13 @@ CREATE TABLE `site_settings` (
   `hero_title` varchar(255) DEFAULT NULL,
   `hero_subtitle` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `site_settings`
+--
+
+INSERT INTO `site_settings` (`id`, `site_name`, `phone`, `whatsapp`, `email`, `address`, `hero_title`, `hero_subtitle`) VALUES
+(1, 'Welding Sudhantha', '0718888888', '0718888888', 'kasunrathnayake121@gmail.com', '123\r\n1 st lane', 'Hello Kittie', 'World with marvelous Hello Kitties');
 
 --
 -- Indexes for dumped tables
@@ -300,13 +365,13 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `category_properties`
 --
 ALTER TABLE `category_properties`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `inquiries`
@@ -318,43 +383,43 @@ ALTER TABLE `inquiries`
 -- AUTO_INCREMENT for table `portfolio_images`
 --
 ALTER TABLE `portfolio_images`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `portfolio_items`
 --
 ALTER TABLE `portfolio_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `product_extra_properties`
 --
 ALTER TABLE `product_extra_properties`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `product_property_values`
 --
 ALTER TABLE `product_property_values`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `site_settings`
 --
 ALTER TABLE `site_settings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

@@ -252,3 +252,368 @@ function is_valid_whatsapp_text(string $value): bool
 {
     return mb_strlen($value) <= 50;
 }
+
+
+function get_site_settings(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT * FROM site_settings ORDER BY id ASC LIMIT 1");
+    $settings = $stmt->fetch();
+
+    return $settings ?: [
+        'site_name' => 'Welding Company',
+        'phone' => '',
+        'whatsapp' => '',
+        'email' => '',
+        'address' => '',
+        'hero_title' => 'Custom Welding & Metal Fabrication',
+        'hero_subtitle' => 'We build metal products and custom fabrication work for homes, businesses, and projects.'
+    ];
+}
+
+function get_featured_products(PDO $pdo, int $limit = 6): array
+{
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.name AS category_name,
+               (
+                   SELECT pi.image_path
+                   FROM product_images pi
+                   WHERE pi.product_id = p.id
+                   ORDER BY pi.sort_order ASC, pi.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM products p
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE p.status = 1 AND p.is_featured = 1
+        ORDER BY p.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function get_latest_products(PDO $pdo, int $limit = 6): array
+{
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.name AS category_name,
+               (
+                   SELECT pi.image_path
+                   FROM product_images pi
+                   WHERE pi.product_id = p.id
+                   ORDER BY pi.sort_order ASC, pi.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM products p
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE p.status = 1
+        ORDER BY p.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function get_featured_portfolio_items(PDO $pdo, int $limit = 6): array
+{
+    $stmt = $pdo->prepare("
+        SELECT pi.*,
+               (
+                   SELECT pim.image_path
+                   FROM portfolio_images pim
+                   WHERE pim.portfolio_item_id = pi.id
+                   ORDER BY pim.sort_order ASC, pim.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM portfolio_items pi
+        WHERE pi.status = 1 AND pi.is_featured = 1
+        ORDER BY pi.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function get_latest_portfolio_items(PDO $pdo, int $limit = 6): array
+{
+    $stmt = $pdo->prepare("
+        SELECT pi.*,
+               (
+                   SELECT pim.image_path
+                   FROM portfolio_images pim
+                   WHERE pim.portfolio_item_id = pi.id
+                   ORDER BY pim.sort_order ASC, pim.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM portfolio_items pi
+        WHERE pi.status = 1
+        ORDER BY pi.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function get_whatsapp_link(?string $number, string $message = ''): string
+{
+    $cleanNumber = preg_replace('/[^0-9]/', '', (string)$number);
+
+    if ($cleanNumber === '') {
+        return '#';
+    }
+
+    $url = 'https://wa.me/' . $cleanNumber;
+
+    if ($message !== '') {
+        $url .= '?text=' . urlencode($message);
+    }
+
+    return $url;
+}
+
+function get_public_categories(PDO $pdo): array
+{
+    $stmt = $pdo->query("
+        SELECT c.*,
+               (
+                   SELECT COUNT(*)
+                   FROM products p
+                   WHERE p.category_id = c.id AND p.status = 1
+               ) AS product_count
+        FROM categories c
+        WHERE c.status = 1
+        ORDER BY c.name ASC
+    ");
+    return $stmt->fetchAll();
+}
+
+function get_public_products(PDO $pdo, string $search = '', int $categoryId = 0): array
+{
+    $sql = "
+        SELECT p.*, c.name AS category_name,
+               (
+                   SELECT pi.image_path
+                   FROM product_images pi
+                   WHERE pi.product_id = p.id
+                   ORDER BY pi.sort_order ASC, pi.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM products p
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE p.status = 1
+          AND c.status = 1
+    ";
+
+    $params = [];
+
+    if ($categoryId > 0) {
+        $sql .= " AND p.category_id = ? ";
+        $params[] = $categoryId;
+    }
+
+    if ($search !== '') {
+        $sql .= " AND (
+            p.name LIKE ?
+            OR p.short_description LIKE ?
+            OR p.full_description LIKE ?
+            OR c.name LIKE ?
+        ) ";
+        $searchLike = '%' . $search . '%';
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+    }
+
+    $sql .= " ORDER BY p.is_featured DESC, p.id DESC ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll();
+}
+
+function get_public_product_by_slug(PDO $pdo, string $slug): ?array
+{
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.name AS category_name, c.slug AS category_slug
+        FROM products p
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE p.slug = ?
+          AND p.status = 1
+          AND c.status = 1
+        LIMIT 1
+    ");
+    $stmt->execute([$slug]);
+    $product = $stmt->fetch();
+
+    return $product ?: null;
+}
+
+function get_product_images(PDO $pdo, int $productId): array
+{
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM product_images
+        WHERE product_id = ?
+        ORDER BY sort_order ASC, id ASC
+    ");
+    $stmt->execute([$productId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_product_category_properties_with_values(PDO $pdo, int $productId): array
+{
+    $stmt = $pdo->prepare("
+        SELECT cp.property_name, cp.field_type, cp.sort_order, ppv.property_value
+        FROM product_property_values ppv
+        INNER JOIN category_properties cp ON cp.id = ppv.category_property_id
+        WHERE ppv.product_id = ?
+          AND cp.status = 1
+          AND ppv.property_value IS NOT NULL
+          AND ppv.property_value != ''
+        ORDER BY cp.sort_order ASC, cp.id ASC
+    ");
+    $stmt->execute([$productId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_product_extra_properties(PDO $pdo, int $productId): array
+{
+    $stmt = $pdo->prepare("
+        SELECT property_name, property_value, sort_order
+        FROM product_extra_properties
+        WHERE product_id = ?
+          AND property_name IS NOT NULL
+          AND property_name != ''
+        ORDER BY sort_order ASC, id ASC
+    ");
+    $stmt->execute([$productId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_related_products(PDO $pdo, int $categoryId, int $excludeProductId, int $limit = 4): array
+{
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.name AS category_name,
+               (
+                   SELECT pi.image_path
+                   FROM product_images pi
+                   WHERE pi.product_id = p.id
+                   ORDER BY pi.sort_order ASC, pi.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM products p
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE p.status = 1
+          AND c.status = 1
+          AND p.category_id = ?
+          AND p.id != ?
+        ORDER BY p.is_featured DESC, p.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $categoryId, PDO::PARAM_INT);
+    $stmt->bindValue(2, $excludeProductId, PDO::PARAM_INT);
+    $stmt->bindValue(3, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+function get_public_portfolio_items(PDO $pdo, string $search = ''): array
+{
+    $sql = "
+        SELECT pi.*,
+               (
+                   SELECT pim.image_path
+                   FROM portfolio_images pim
+                   WHERE pim.portfolio_item_id = pi.id
+                   ORDER BY pim.sort_order ASC, pim.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM portfolio_items pi
+        WHERE pi.status = 1
+    ";
+
+    $params = [];
+
+    if ($search !== '') {
+        $sql .= " AND (
+            pi.title LIKE ?
+            OR pi.short_description LIKE ?
+            OR pi.full_description LIKE ?
+        ) ";
+        $searchLike = '%' . $search . '%';
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+    }
+
+    $sql .= " ORDER BY pi.is_featured DESC, pi.id DESC ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll();
+}
+
+function get_public_portfolio_item_by_slug(PDO $pdo, string $slug): ?array
+{
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM portfolio_items
+        WHERE slug = ?
+          AND status = 1
+        LIMIT 1
+    ");
+    $stmt->execute([$slug]);
+    $item = $stmt->fetch();
+
+    return $item ?: null;
+}
+
+function get_portfolio_images(PDO $pdo, int $portfolioItemId): array
+{
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM portfolio_images
+        WHERE portfolio_item_id = ?
+        ORDER BY sort_order ASC, id ASC
+    ");
+    $stmt->execute([$portfolioItemId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_related_portfolio_items(PDO $pdo, int $excludeId, int $limit = 4): array
+{
+    $stmt = $pdo->prepare("
+        SELECT pi.*,
+               (
+                   SELECT pim.image_path
+                   FROM portfolio_images pim
+                   WHERE pim.portfolio_item_id = pi.id
+                   ORDER BY pim.sort_order ASC, pim.id ASC
+                   LIMIT 1
+               ) AS primary_image
+        FROM portfolio_items pi
+        WHERE pi.status = 1
+          AND pi.id != ?
+        ORDER BY pi.is_featured DESC, pi.id DESC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $excludeId, PDO::PARAM_INT);
+    $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
