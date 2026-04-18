@@ -4,6 +4,13 @@ if (!isset($pageTitle)) {
 }
 
 $frontendCssFiles = $frontendCssFiles ?? [];
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+$isHome = $currentPage === 'index.php';
+$isProducts = in_array($currentPage, ['products.php', 'product.php'], true);
+$isPortfolio = in_array($currentPage, ['portfolio.php', 'portfolio-item.php'], true);
+$isAbout = $currentPage === 'about.php';
+$isContact = $currentPage === 'contact.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,11 +37,11 @@ $frontendCssFiles = $frontendCssFiles ?? [];
         </button>
 
         <nav class="site-nav" id="siteNav">
-            <a href="<?php echo BASE_URL; ?>">Home</a>
-            <a href="<?php echo BASE_URL; ?>products.php">Products</a>
-            <a href="<?php echo BASE_URL; ?>portfolio.php">Portfolio</a>
-            <a href="<?php echo BASE_URL; ?>about.php">About</a>
-            <a href="<?php echo BASE_URL; ?>contact.php" class="nav-cta">Contact</a>
+            <a href="<?php echo BASE_URL; ?>" class="<?php echo $isHome ? 'active' : ''; ?>">Home</a>
+            <a href="<?php echo BASE_URL; ?>products.php" class="<?php echo $isProducts ? 'active' : ''; ?>">Products</a>
+            <a href="<?php echo BASE_URL; ?>portfolio.php" class="<?php echo $isPortfolio ? 'active' : ''; ?>">Portfolio</a>
+            <a href="<?php echo BASE_URL; ?>about.php" class="<?php echo $isAbout ? 'active' : ''; ?>">About</a>
+            <a href="<?php echo BASE_URL; ?>contact.php" class="nav-cta <?php echo $isContact ? 'active-cta' : ''; ?>">Contact</a>
         </nav>
     </div>
 </header>

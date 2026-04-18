@@ -617,3 +617,29 @@ function get_related_portfolio_items(PDO $pdo, int $excludeId, int $limit = 4): 
 
     return $stmt->fetchAll();
 }
+
+function get_contactable_products(PDO $pdo): array
+{
+    $stmt = $pdo->query("
+        SELECT id, name
+        FROM products
+        WHERE status = 1
+        ORDER BY name ASC
+    ");
+
+    return $stmt->fetchAll();
+}
+
+function get_product_by_name(PDO $pdo, string $name): ?array
+{
+    $stmt = $pdo->prepare("
+        SELECT id, name
+        FROM products
+        WHERE status = 1 AND name = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$name]);
+    $product = $stmt->fetch();
+
+    return $product ?: null;
+}
